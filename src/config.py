@@ -1,3 +1,4 @@
+import io
 import sys
 import logging
 from logging.handlers import RotatingFileHandler
@@ -50,6 +51,7 @@ logging.basicConfig(
             mode="a",
             backupCount=5,
             maxBytes=100000,
+            encoding="utf-8",
         )
     ],
     datefmt="%d.%m.%Y-%H:%M:%S",
