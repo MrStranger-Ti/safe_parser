@@ -12,7 +12,6 @@ from src.parser.format.formatters import (
     CharacteristicsFormatter,
     DefaultFieldsFormatter,
     DescriptionFormatter,
-    GuarantyFormatter,
 )
 
 # Main
@@ -65,8 +64,9 @@ log = logging.getLogger(__name__)
 
 URL = _config.get("required", "URL")
 if not URL:
-    log.error("No URL. Set URL option in config.ini")
-    raise ValueError("URL option is required")
+    msg = "No URL. Set URL option in config.ini"
+    log.error(msg)
+    raise ValueError(msg)
 
 DEFAULT_FORMATTERS = [
     DefaultFieldsFormatter,
@@ -74,7 +74,6 @@ DEFAULT_FORMATTERS = [
     DescriptionFormatter,
     ImagesFormatter,
     CharacteristicsFormatter,
-    GuarantyFormatter,
 ]
 
 
@@ -113,6 +112,9 @@ COLS = {
     "unit_measurement": 24,  # Единица измерения
     "available": 25,  # Доступность
     "weight": 34,  # Вес
+    "outer_depth": 35,  # Длина
+    "outer_width": 36,  # Ширина
+    "outer_height": 37,  # Высота
 }
 
 START_ROW = 5

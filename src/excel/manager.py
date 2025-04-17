@@ -62,17 +62,22 @@ class ExcelManager:
         try:
             self._workbook.save(config.RESULT_FILE_DIR)
         except PermissionError as exc:
-            log.error(f"{str(exc)}. Close result excel file and try again.")
-            raise exc
+            msg = f"{str(exc)}. Close result excel file and try again."
+            log.error(msg)
+            raise PermissionError(msg)
 
         log.info("Excel file has been saved")
 
     def insert_rows(self) -> None:
+        if not self._sheet:
+            msg = "Use Excel manager as context manager to call insert_rows method"
+            log.error(msg)
+            raise AttributeError(msg)
+
         log.info("Starting to prepare excel file")
 
-        sheet = self._get_sheet()
         for row_num, row in enumerate(
             tqdm(self.rows, **CREATING_EXCEL_CONFIG), start=config.START_ROW
         ):
             for col in row:
-                sheet.cell(row=row_num, column=col.num, value=col.data)
+                self._sheet.cell(row=row_num, column=col.num, value=col.data)

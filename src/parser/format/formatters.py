@@ -1,4 +1,6 @@
-from typing import Any
+import re
+
+import bs4
 
 from src.parser.format.base import BaseFormatter
 from src.utils.format import clear_html_entity
@@ -27,12 +29,27 @@ class SimpleFieldsFormatter(BaseFormatter):
         "unit_measurement",
         "available",
         "weight",
+        "outer_depth",
+        "outer_width",
+        "outer_height",
     ]
 
     def format(self, data: dict[str, str]) -> dict[str, str]:
-        return {
-            name: value for name, value in data.items() if name in self.SIMPLE_FIELDS
+        simple_data = {
+            name: value.strip("-")
+            for name, value in data.items()
+            if name in self.SIMPLE_FIELDS
         }
+
+        if simple_data.get("warranty"):
+            simple_data["warranty"] = "Да"
+        else:
+            simple_data.update({"warranty": "Нет"})
+
+        if id_ := simple_data.get("id"):
+            simple_data["id"] = id_ + "S"
+
+        return simple_data
 
 
 class DescriptionFormatter(BaseFormatter):
@@ -41,13 +58,24 @@ class DescriptionFormatter(BaseFormatter):
         "detail_text",
     ]
 
+    VALID_HTML_TAGS = ["p", "h2", "ul", "ol", "li", "br"]
+
     def format(self, data: dict[str, str]) -> dict[str, str]:
         for descr_field in self.DESCRIPTION_FIELDS:
             descr = data.get(descr_field)
             if descr:
-                return {"description": clear_html_entity(descr)}
+                return {"description": self.clear(descr)}
 
         return {}
+
+    def clear(self, text: str) -> str:
+        cleared_text_from_entity = clear_html_entity(text)
+        soup = bs4.BeautifulSoup(cleared_text_from_entity, "lxml")
+        for tag in soup.find_all(True):
+            if tag.name not in self.VALID_HTML_TAGS:
+                tag.unwrap()
+
+        return str(soup)
 
 
 class CharacteristicsFormatter(BaseFormatter):
@@ -147,16 +175,9 @@ class ImagesFormatter(BaseFormatter):
     ]
 
     def format(self, data: dict[str, str]) -> dict[str, str]:
-        images = [value for name, value in data.items() if name in self.IMAGES_FIELDS][
-            :10
-        ]
+        images = [
+            value
+            for name, value in data.items()
+            if name in self.IMAGES_FIELDS and value
+        ][:10]
         return {"images": ",".join(images)}
-
-
-class GuarantyFormatter(BaseFormatter):
-    def format(self, data: Any) -> Any:
-        guaranty = data.get("warranty")
-        if guaranty:
-            return {"warranty": "Да"}
-
-        return {"warranty": "Нет"}
