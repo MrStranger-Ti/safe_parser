@@ -27,14 +27,14 @@ _config.read(BASE_DIR / "config.ini", encoding="utf-8")
 
 # Logging
 
-LOG_LEVELS = {
-    "CRITICAL": 50,
-    "ERROR": 40,
-    "WARNING": 30,
-    "INFO": 20,
-    "DEBUG": 10,
-    "NOTSET": 0,
-}
+LOG_LEVELS = [
+    "CRITICAL",
+    "ERROR",
+    "WARNING",
+    "INFO",
+    "DEBUG",
+    "NOTSET",
+]
 
 LOG_LEVEL = _config.get("optional", "LOG_LEVEL")
 if LOG_LEVEL not in LOG_LEVELS:

@@ -47,7 +47,7 @@ class SimpleFieldsFormatter(BaseFormatter):
             simple_data.update({"warranty": "Нет"})
 
         if id_ := simple_data.get("id"):
-            simple_data["id"] = id_ + "S"
+            simple_data["id"] = id_ + "P"
 
         return simple_data
 
